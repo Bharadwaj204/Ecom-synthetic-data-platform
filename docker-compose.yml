@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Main data pipeline service
+  pipeline:
+    build: .
+    container_name: ecom-pipeline
+    volumes:
+      - ./data:/app/data
+      - ./database:/app/database
+      - ./logs:/app/logs
+      - ./docs:/app/docs
+    environment:
+      - PYTHONPATH=/app
+    command: python scripts/run_all.py
+
+  # REST API service
+  api:
+    build: .
+    container_name: ecom-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./database:/app/database
+    environment:
+      - PYTHONPATH=/app
+    command: python api/main.py
+    depends_on:
+      - pipeline
+
+  # Streamlit dashboard service
+  dashboard:
+    build: .
+    container_name: ecom-dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./database:/app/database
+    environment:
+      - PYTHONPATH=/app
+    command: streamlit run dashboard/app.py
+    depends_on:
+      - pipeline
+
+volumes:
+  data:
+  database:
+  logs:
+  docs:

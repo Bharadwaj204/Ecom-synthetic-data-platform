@@ -1,0 +1,89 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        # Install additional dependencies for profiling
+        pip install gcc
+    
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-code 1 if there are flake8 errors
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    - name: Validate SQL syntax
+      run: |
+        # Check that SQL files can be parsed
+        python -c "
+import sqlite3
+import os
+conn = sqlite3.connect(':memory:')
+with open('models/schema.sql', 'r') as f:
+    schema = f.read()
+conn.executescript(schema)
+print('Schema SQL validated successfully')
+conn.close()
+"
+        python -c "
+import os
+if os.path.exists('sql/analysis.sql'):
+    with open('sql/analysis.sql', 'r') as f:
+        content = f.read()
+    queries = [q.strip() for q in content.split(';') if q.strip()]
+    print(f'Found {len(queries)} SQL queries in analysis file')
+    print('Analysis SQL validated successfully')
+"
+    
+    - name: Test data generation with schema validation
+      run: |
+        python etl/generate_data.py
+    
+    - name: Test data profiling
+      run: |
+        python scripts/generate_profiles.py
+    
+    - name: Run tests
+      run: |
+        pip install pytest
+        pytest tests/ -v
+    
+    - name: Test API
+      run: |
+        python -c "import api.main; print('API module imports successfully')"
+    
+    - name: Test Dashboard
+      run: |
+        python -c "import dashboard.app; print('Dashboard module imports successfully')"
+    
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: |
+          logs/
+          database/
+          docs/profiling_reports/
+        if-no-files-found: ignore

@@ -1,0 +1,14 @@
+faker
+pandas
+numpy
+pytest
+rich
+sqlalchemy
+pydantic
+matplotlib
+ydata-profiling
+pandera
+fastapi
+uvicorn
+streamlit
+plotly

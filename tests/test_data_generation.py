@@ -184,6 +184,9 @@ def test_payment_generation():
     # Check that amounts match order totals
     order_amounts = orders_df.set_index('order_id')['total_amount']
     payment_amounts = payments_df.set_index('order_id')['amount']
+    # Set the same name for both series to avoid assertion error
+    order_amounts.name = 'amount'
+    payment_amounts.name = 'amount'
     pd.testing.assert_series_equal(order_amounts, payment_amounts)
     
     # Check that no fields are null

@@ -39,8 +39,23 @@ def test_sqlite_table_creation():
     conn = sqlite3.connect(db_path)
     
     try:
-        # Read and execute the schema
-        schema_path = "../models/schema.sql"
+        # Read and execute the schema - try multiple possible paths
+        schema_paths = [
+            "../models/schema.sql",
+            "models/schema.sql",
+            "../../models/schema.sql"
+        ]
+        
+        schema_sql = None
+        schema_path = None
+        for path in schema_paths:
+            if os.path.exists(path):
+                schema_path = path
+                break
+                
+        if schema_path is None:
+            raise FileNotFoundError(f"Schema file not found at any of these locations: {schema_paths}")
+        
         with open(schema_path, 'r') as f:
             schema_sql = f.read()
         
@@ -96,8 +111,23 @@ def test_sqlite_row_counts():
     conn = sqlite3.connect(db_path)
     
     try:
-        # Read and execute the schema
-        schema_path = "../models/schema.sql"
+        # Read and execute the schema - try multiple possible paths
+        schema_paths = [
+            "../models/schema.sql",
+            "models/schema.sql",
+            "../../models/schema.sql"
+        ]
+        
+        schema_sql = None
+        schema_path = None
+        for path in schema_paths:
+            if os.path.exists(path):
+                schema_path = path
+                break
+                
+        if schema_path is None:
+            raise FileNotFoundError(f"Schema file not found at any of these locations: {schema_paths}")
+        
         with open(schema_path, 'r') as f:
             schema_sql = f.read()
         
@@ -136,8 +166,23 @@ def test_sample_sql_queries():
     conn = sqlite3.connect(db_path)
     
     try:
-        # Read and execute the schema
-        schema_path = "../models/schema.sql"
+        # Read and execute the schema - try multiple possible paths
+        schema_paths = [
+            "../models/schema.sql",
+            "models/schema.sql",
+            "../../models/schema.sql"
+        ]
+        
+        schema_sql = None
+        schema_path = None
+        for path in schema_paths:
+            if os.path.exists(path):
+                schema_path = path
+                break
+                
+        if schema_path is None:
+            raise FileNotFoundError(f"Schema file not found at any of these locations: {schema_paths}")
+        
         with open(schema_path, 'r') as f:
             schema_sql = f.read()
         

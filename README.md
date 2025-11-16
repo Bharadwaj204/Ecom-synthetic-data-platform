@@ -1,22 +1,20 @@
 # E-commerce Data Engineering Pipeline
 
-A complete end-to-end mini data-engineering system for an e-commerce dataset with production-grade quality.
+A complete end-to-end data engineering pipeline for synthetic e-commerce data with enterprise-grade quality features.
 
 ## 🌟 Overview
 
-This project provides a comprehensive data engineering pipeline that:
+This project provides a comprehensive data engineering solution that:
 
 - Generates synthetic e-commerce datasets with controlled randomness
 - Defines a clean, normalized relational data model
 - Implements an ETL pipeline into SQLite with validation
 - Includes data validation using Pandera schemas
 - Provides automated data profiling reports using ydata-profiling
-- Includes data validation, logging, tests, and auto-generated documentation
-- Provides SQL analysis queries for business insights
 - Offers REST API access using FastAPI
 - Includes interactive analytics dashboard using Streamlit
-- Is ready for GitHub with CI pipeline and comprehensive documentation
 - Supports containerization with Docker
+- Features comprehensive testing and documentation
 
 ## 📊 Entity Relationship Diagram
 
@@ -38,10 +36,10 @@ ecom_project/
 │   └── main.py
 ├── dashboard/         # Streamlit analytics dashboard
 │   └── app.py
-├── data/              # Generated CSV files
-├── database/          # SQLite database
+├── data/              # Generated CSV files (created during execution)
+├── database/          # SQLite database (created during execution)
 ├── docs/              # Auto-generated documentation
-│   └── profiling_reports/  # Data profiling reports
+│   └── profiling_reports/  # Data profiling reports (created during execution)
 ├── etl/               # ETL pipeline scripts
 │   ├── generate_data.py
 │   └── load_sqlite.py
@@ -54,6 +52,8 @@ ecom_project/
 ├── sql/               # SQL analysis queries
 │   └── analysis.sql
 ├── tests/             # Test suite
+│   ├── test_api.py
+│   ├── test_dashboard.py
 │   ├── test_data_generation.py
 │   └── test_etl.py
 ├── .gitignore
@@ -63,8 +63,7 @@ ecom_project/
 ├── Dockerfile         # Docker configuration
 ├── docker-compose.yml # Service orchestration
 ├── Makefile           # Build automation
-├── README.md
-└── requirements.txt
+└── requirements.txt   # Python dependencies
 ```
 
 ## 🚀 Quick Start
@@ -116,7 +115,7 @@ make dashboard
 make clean
 ```
 
-### 2. Run the Complete Pipeline
+### 3. Run the Complete Pipeline
 
 ```bash
 # Run the entire pipeline with one command
@@ -126,35 +125,8 @@ python scripts/run_all.py
 This will:
 1. Generate synthetic data (2,000 customers, 600 products, 4,000 orders, etc.)
 2. Load data into SQLite database
-3. Run SQL analysis queries
-4. Generate documentation
-
-### 3. Individual Steps
-
-#### Generate Data
-```bash
-cd etl
-python generate_data.py
-```
-
-#### Load into SQLite
-```bash
-cd etl
-python load_sqlite.py
-```
-
-#### Run Analysis Queries
-```bash
-# Use any SQLite client to run queries from sql/analysis.sql
-# Or examine the file directly
-cat sql/analysis.sql
-```
-
-#### Generate Documentation
-```bash
-cd scripts
-python generate_docs.py
-```
+3. Generate data profiling reports
+4. Create comprehensive documentation
 
 ### 4. Using Docker
 
@@ -184,11 +156,8 @@ docker-compose up dashboard   # Streamlit dashboard on port 8501
 Run the test suite:
 
 ```bash
-# Install pytest if not already installed
-pip install pytest
-
 # Run all tests
-pytest tests/ -v
+python -m pytest tests/ -v
 ```
 
 ## 📈 SQL Analysis Queries
@@ -257,7 +226,7 @@ GitHub Actions workflow includes:
 - Python 3.7+
 - See `requirements.txt` for Python package dependencies
 
-New dependencies for enhanced features:
+Key dependencies:
 - **ydata-profiling**: For automated data profiling reports
 - **pandera**: For data schema validation
 - **fastapi**: For REST API functionality
@@ -282,4 +251,4 @@ git remote add origin https://github.com/your-username/ecom-project.git
 
 # Push to GitHub
 git push -u origin main
-```"# Ecom-synthetic-data-platform" 
+```

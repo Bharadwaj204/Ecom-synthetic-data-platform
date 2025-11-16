@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-ETL pipeline to load e-commerce data into SQLite with validation and logging.
-"""
-
 import pandas as pd
 import sqlite3
 import logging
@@ -15,7 +10,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("../logs/etl.log"),
+        logging.FileHandler("../logs/etl.log"),  # Fixed path to match original structure
         logging.StreamHandler(sys.stdout)
     ]
 )
@@ -23,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def setup_logging():
     """Setup logging directory and file"""
-    log_dir = "../logs"
+    log_dir = "../logs"  # Fixed path to match original structure
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     return os.path.join(log_dir, "etl.log")
@@ -32,7 +27,19 @@ def create_database_schema(conn, schema_file="../models/schema.sql"):
     """Create database tables from schema file"""
     try:
         logger.info("Creating database schema...")
-        with open(schema_file, 'r') as f:
+        # Use absolute path resolution
+        schema_path = Path(schema_file).resolve()
+        if not schema_path.exists():
+            # Try alternative path
+            schema_path = Path("models/schema.sql").resolve()
+        if not schema_path.exists():
+            # Try another alternative path
+            schema_path = Path("../../models/schema.sql").resolve()
+            
+        if not schema_path.exists():
+            raise FileNotFoundError(f"Schema file not found at {schema_file} or alternative paths")
+            
+        with open(schema_path, 'r') as f:
             schema_sql = f.read()
         
         cursor = conn.cursor()
@@ -47,17 +54,30 @@ def create_database_schema(conn, schema_file="../models/schema.sql"):
 def load_csv_to_table(csv_file_path, table_name, conn, chunk_size=1000):
     """Load CSV data into SQLite table in chunks with validation"""
     try:
-        if not os.path.exists(csv_file_path):
-            logger.warning(f"File not found: {csv_file_path}")
+        # Try multiple possible paths
+        possible_paths = [
+            csv_file_path,
+            f"../{csv_file_path}",
+            f"../../{csv_file_path}"
+        ]
+        
+        actual_path = None
+        for path in possible_paths:
+            if os.path.exists(path):
+                actual_path = path
+                break
+                
+        if actual_path is None:
+            logger.warning(f"File not found at any of these locations: {possible_paths}")
             return False
         
-        logger.info(f"Loading {csv_file_path} into {table_name} table...")
+        logger.info(f"Loading {actual_path} into {table_name} table...")
         
         # Read CSV in chunks
         chunk_count = 0
         total_rows = 0
         
-        for chunk in pd.read_csv(csv_file_path, chunksize=chunk_size):
+        for chunk in pd.read_csv(actual_path, chunksize=chunk_size):
             chunk_count += 1
             rows_in_chunk = len(chunk)
             total_rows += rows_in_chunk
@@ -170,7 +190,7 @@ def main():
     logger.info(f"Logging to file: {log_file}")
     
     # Database connection
-    db_path = "../database/ecom.db"
+    db_path = "../database/ecom.db"  # Fixed path to match original structure
     conn = None
     
     try:
@@ -193,11 +213,11 @@ def main():
         
         # Define CSV files and corresponding table names
         csv_files_and_tables = [
-            ('../data/customers.csv', 'customers'),
-            ('../data/products.csv', 'products'),
-            ('../data/orders.csv', 'orders'),
-            ('../data/order_items.csv', 'order_items'),
-            ('../data/payments.csv', 'payments')
+            ('data/customers.csv', 'customers'),  # Will look in multiple locations
+            ('data/products.csv', 'products'),    # Will look in multiple locations
+            ('data/orders.csv', 'orders'),        # Will look in multiple locations
+            ('data/order_items.csv', 'order_items'),  # Will look in multiple locations
+            ('data/payments.csv', 'payments')     # Will look in multiple locations
         ]
         
         # Load each CSV file into its corresponding table

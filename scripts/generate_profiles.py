@@ -20,12 +20,12 @@ def generate_profile_report(df, title, output_path):
     logger.info(f"Generating profile report for {title}...")
     
     # Generate profile report
+    # Remove dark_mode parameter which is no longer supported
     profile = ProfileReport(
         df, 
         title=title,
-        explorative=True,
-        dark_mode=True,
-        pool_size=0  # Disable multiprocessing for compatibility
+        explorative=True
+        # dark_mode parameter removed as it's no longer supported
     )
     
     # Save report

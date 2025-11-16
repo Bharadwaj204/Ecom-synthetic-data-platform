@@ -10,6 +10,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 import os
+import sys
+
+# Add the project root to the path so we can import from other modules
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Database path
 DB_PATH = "../database/ecom.db"
@@ -17,10 +21,32 @@ DB_PATH = "../database/ecom.db"
 # Helper function to get database connection
 def get_db_connection():
     if not os.path.exists(DB_PATH):
-        st.error("Database not found. Please run the data pipeline first.")
-        st.stop()
+        st.warning("Database not found. Generating sample data...")
+        if generate_sample_data():
+            st.success("Sample data generated successfully!")
+        else:
+            st.error("Failed to generate sample data. Please run the data pipeline first.")
+            st.stop()
     conn = sqlite3.connect(DB_PATH)
     return conn
+
+def generate_sample_data():
+    """Generate sample data when database doesn't exist"""
+    try:
+        # Import the utility function
+        from dashboard.utils import load_sample_data_to_database
+        
+        # Create directories if they don't exist
+        os.makedirs("../data", exist_ok=True)
+        os.makedirs("../database", exist_ok=True)
+        os.makedirs("../logs", exist_ok=True)
+        
+        # Generate and load sample data
+        return load_sample_data_to_database()
+        
+    except Exception as e:
+        st.error(f"Error generating sample data: {str(e)}")
+        return False
 
 # Page configuration
 st.set_page_config(

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Generate data profiling reports using ydata-profiling for all e-commerce datasets.
+Generate data profiling reports for all datasets using ydata-profiling.
+This script is optional and requires additional dependencies.
 """
 
 import pandas as pd
 import os
-from ydata_profiling import ProfileReport
+import sys
 import logging
 
 # Configure logging
@@ -15,35 +16,34 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def generate_profile_report(df, title, output_path):
-    """Generate a profile report for a dataframe"""
-    logger.info(f"Generating profile report for {title}...")
-    
-    # Generate profile report
-    # Remove dark_mode parameter which is no longer supported
-    profile = ProfileReport(
-        df, 
-        title=title,
-        explorative=True
-        # dark_mode parameter removed as it's no longer supported
-    )
-    
-    # Save report
-    profile.to_file(output_path)
-    logger.info(f"Profile report saved to {output_path}")
+def check_profiling_dependencies():
+    """Check if profiling dependencies are available"""
+    try:
+        from ydata_profiling import ProfileReport
+        return True
+    except ImportError as e:
+        logger.error(f"Profiling dependencies not available: {e}")
+        logger.info("To install profiling dependencies, run: pip install -r profiling_requirements.txt")
+        return False
 
 def main():
-    """Generate profiling reports for all e-commerce datasets"""
+    """Generate profiling reports for all datasets"""
+    # Check if profiling dependencies are available
+    if not check_profiling_dependencies():
+        logger.error("Cannot generate profiling reports due to missing dependencies")
+        sys.exit(1)
+    
+    from ydata_profiling import ProfileReport
+    
     logger.info("Starting data profiling report generation...")
     
     # Create profiling reports directory
     reports_dir = "../docs/profiling_reports"
-    if not os.path.exists(reports_dir):
-        os.makedirs(reports_dir)
-        logger.info(f"Created directory: {reports_dir}")
+    os.makedirs(reports_dir, exist_ok=True)
+    logger.info(f"Created directory: {reports_dir}")
     
-    # Define data files and corresponding report titles
-    data_files = [
+    # Define datasets to profile
+    datasets = [
         ("../data/customers.csv", "Customers Data Profile"),
         ("../data/products.csv", "Products Data Profile"),
         ("../data/orders.csv", "Orders Data Profile"),
@@ -51,21 +51,30 @@ def main():
         ("../data/payments.csv", "Payments Data Profile")
     ]
     
-    # Generate profile reports for each dataset
-    for file_path, title in data_files:
-        try:
-            if os.path.exists(file_path):
-                logger.info(f"Loading data from {file_path}...")
-                df = pd.read_csv(file_path)
-                report_filename = os.path.splitext(os.path.basename(file_path))[0] + "_profile.html"
-                report_path = os.path.join(reports_dir, report_filename)
-                generate_profile_report(df, title, report_path)
-            else:
-                logger.warning(f"File not found: {file_path}")
-        except Exception as e:
-            logger.error(f"Error generating profile for {file_path}: {str(e)}")
+    # Generate profile report for each dataset
+    for csv_path, title in datasets:
+        if os.path.exists(csv_path):
+            logger.info(f"Loading data from {csv_path}...")
+            df = pd.read_csv(csv_path)
+            
+            logger.info(f"Generating profile report for {title}...")
+            # Generate profile report
+            # Remove dark_mode parameter which is no longer supported
+            profile = ProfileReport(
+                df, 
+                title=title,
+                explorative=True
+                # dark_mode parameter removed as it's no longer supported
+            )
+            
+            # Save report
+            output_path = os.path.join(reports_dir, f"{title.lower().replace(' ', '_')}.html")
+            profile.to_file(output_path)
+            logger.info(f"Saved profile report to {output_path}")
+        else:
+            logger.warning(f"CSV file not found: {csv_path}")
     
-    logger.info("Data profiling report generation completed!")
+    logger.info("Data profiling reports generation completed!")
 
 if __name__ == "__main__":
     main()

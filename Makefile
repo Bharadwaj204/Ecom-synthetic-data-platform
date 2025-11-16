@@ -18,7 +18,7 @@ help:
 	@echo "  make ingest         - Ingest data into SQLite"
 	@echo "  make test           - Run tests"
 	@echo "  make docs           - Generate documentation"
-	@echo "  make profile        - Generate data profiling reports"
+	@echo "  make profile        - Generate data profiling reports (requires additional dependencies)"
 	@echo "  make api            - Start REST API server"
 	@echo "  make dashboard      - Start Streamlit dashboard"
 	@echo "  make run            - Run complete pipeline"
@@ -30,6 +30,11 @@ help:
 .PHONY: setup
 setup:
 	$(PIP) install -r requirements.txt
+
+# Setup profiling dependencies
+.PHONY: setup-profile
+setup-profile:
+	$(PIP) install -r profiling_requirements.txt
 
 # Generate synthetic data
 .PHONY: generate
@@ -54,6 +59,8 @@ docs:
 # Generate data profiling reports
 .PHONY: profile
 profile:
+	@echo "Installing profiling dependencies..."
+	$(PIP) install -r profiling_requirements.txt
 	$(PYTHON) scripts/generate_profiles.py
 
 # Start REST API server

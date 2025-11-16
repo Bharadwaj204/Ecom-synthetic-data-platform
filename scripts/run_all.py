@@ -79,9 +79,13 @@ def main():
                 queries = f.read().split(';')
                 logger.info(f"Found {len(queries)-1} SQL queries in analysis file")
         
-        # Step 4: Generate data profiling reports
+        # Step 4: Generate data profiling reports (optional)
         logger.info("Step 4: Generating data profiling reports...")
-        run_command("python generate_profiles.py", cwd=scripts_dir)
+        try:
+            run_command("python generate_profiles.py", cwd=scripts_dir)
+        except Exception as e:
+            logger.warning(f"Could not generate profiling reports: {str(e)}")
+            logger.info("Profiling reports are optional. Skipping...")
         
         # Step 5: Generate documentation
         logger.info("Step 5: Generating documentation...")

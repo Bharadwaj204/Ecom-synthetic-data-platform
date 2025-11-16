@@ -142,3 +142,6 @@ database/
 logs/
 *.db
 *.sqlite
+
+# Streamlit
+.streamlit/config.toml

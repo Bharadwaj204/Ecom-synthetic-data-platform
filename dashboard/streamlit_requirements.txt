@@ -1,13 +1,10 @@
 faker
 pandas
 numpy
-pytest
 rich
 sqlalchemy
 pydantic
 matplotlib
 pandera
-fastapi
-uvicorn
 streamlit
 plotly

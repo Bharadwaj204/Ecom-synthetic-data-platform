@@ -2,6 +2,10 @@
 
 A complete end-to-end data engineering pipeline that generates synthetic e-commerce data, processes it through an ETL pipeline, stores it in a database, and provides analytics through an API and dashboard.
 
+## 🎯 Live Demo
+
+**Dashboard**: [https://bharadwaj204-ecom-synthetic-data-platform-dashboardapp-5zycgc.streamlit.app/](https://bharadwaj204-ecom-synthetic-data-platform-dashboardapp-5zycgc.streamlit.app/)
+
 ## 🏗️ Architecture
 
 ```
